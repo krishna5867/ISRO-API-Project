@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ISRO</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <!-- Section 1 -->
+        <div class="text-btn">
+            <h2 class="center">List of spacecraft created by ISRO</h2>
+            <button id="spacecraft" class="btnn" onclick="toggleList()">Show</button>
+        </div>
+        <ol id="spacecrafts-list" style="display: none"></ol>
+        <script>
+        const url = "https://isro.vercel.app/api/spacecrafts";
+        const spacecraftsList = document.getElementById("spacecrafts-list");
+
+        function toggleList() {
+            if (
+            spacecraftsList.style.display === "none" ||
+            spacecraftsList.style.display === ""
+            ) {
+            fetch(url)
+                .then((response) => response.json())
+                .then((data) => {
+                data.spacecrafts.forEach((spacecraft) => {
+                    const li = document.createElement("li");
+                    li.textContent = spacecraft.name;
+                    spacecraftsList.appendChild(li);
+                });
+                })
+                .catch((error) => console.error(error));
+
+            spacecraftsList.style.display = "block";
+            document.getElementById("spacecraft").textContent = "Hide";
+            } else {
+            spacecraftsList.innerHTML = ""; // clear the list
+            spacecraftsList.style.display = "none";
+            document.getElementById("spacecraft").textContent = "Show";
+            }
+        }
+        </script>
+
+        <!-- Section 2 -->
+        <div class="text-btn">
+            <h2 class="center">List of Rockets created by ISRO</h2>
+            <button id="launcher" class="btnn" onclick="toggleLauncherList()">Show</button>
+        </div>
+        <ol id="launchers-list" style="display: none"></ol>
+        <script>
+        const url2 = "https://isro.vercel.app/api/launchers";
+        const launchersList = document.getElementById("launchers-list");
+
+        function toggleLauncherList() {
+            if (
+            launchersList.style.display === "none" ||
+            launchersList.style.display === ""
+            ) {
+            fetch(url2)
+                .then((response) => response.json())
+                .then((data) => {
+                data.launchers.forEach((launcher) => {
+                    const li = document.createElement("li");
+                    li.textContent = launcher.id;
+                    launchersList.appendChild(li);
+                });
+                })
+                .catch((error) => console.error(error));
+
+            launchersList.style.display = "block";
+            document.getElementById("launcher").textContent = "Hide";
+            } else {
+            launchersList.innerHTML = "";
+            launchersList.style.display = "none";
+            document.getElementById("launcher").textContent = "Show";
+            }
+        }
+        </script>
+
+        <!-- Section 3 -->
+
+        <h2>Search the Customer Satellites details based on country name .</h2>
+        <div class="search">
+            <label for="country-name">Enter country name:</label>
+            <input type="text" id="country-name" name="country-name" />
+            <button type="button" onclick="fetchSatellites()" class="btnn">Search</button>
+        </div>
+            <ol id="satellites-list"></ol>
+        <script>
+        function fetchSatellites() {
+            const countryName = document
+            .getElementById("country-name")
+            .value.trim();
+            if (!countryName) {
+            const satellitesList = document.getElementById("satellites-list");
+            satellitesList.innerHTML =
+                "<p>Please enter a country name to search for customer satellites.</p>";
+            return;
+            }
+            const url = "https://isro.vercel.app/api/customer_satellites";
+            fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                const dataArray = Array.from(data.customer_satellites);
+                const filteredData = dataArray.filter(
+                (satellite) =>
+                    satellite.country.toLowerCase() === countryName.toLowerCase()
+                );
+                console.log(filteredData);
+                const satellitesList = document.getElementById("satellites-list");
+                satellitesList.innerHTML = "";
+                if (filteredData.length === 0) {
+                satellitesList.innerHTML =
+                    "<p>No customer satellites found for the specified country.</p>";
+                return;
+                }
+                filteredData.forEach((satellite) => {
+                const li = document.createElement("li");
+                li.textContent = `${satellite.id} - ${satellite.country} - ${satellite.launcher} - ${satellite.launch_date}`;
+                satellitesList.appendChild(li);
+                });
+            })
+            .catch((error) => console.error(error));
+        }
+        </script>
+
+        <!-- Section 4 -->
+
+        <h2>Search ISRO centers details based on state.:</h2>
+        <p id="message"></p>
+
+        <label for="stateSelect">Select a state:</label>
+
+        <select id="stateSelect">
+        <option value="">--Select a state--</option>
+        ${States.map(state => `
+        <option value="${state}">${state}</option>
+        `).join('')}
+        </select>
+        <ol id="centerList"></ol>
+
+
+        <script>
+        const States = [
+            "Andhra Pradesh",
+            "Arunachal Pradesh",
+            "Assam",
+            "Bihar",
+            "Chhattisgarh",
+            "Goa",
+            "Gujarat",
+            "Haryana",
+            "Himachal Pradesh",
+            "Jharkhand",
+            "Karnataka",
+            "Kerala",
+            "Madhya Pradesh",
+            "Maharashtra",
+            "Manipur",
+            "Meghalaya",
+            "Mizoram",
+            "Nagaland",
+            "Odisha",
+            "Punjab",
+            "Rajasthan",
+            "Sikkim",
+            "Tamil Nadu",
+            "Telangana",
+            "Tripura",
+            "Uttar Pradesh",
+            "Uttarakhand",
+            "West Bengal",
+        ];
+
+        const apiUrl = "https://isro.vercel.app/api/centres";
+
+        const stateSelect = document.getElementById("stateSelect");
+        const centerList = document.getElementById("centerList");
+        const message = document.getElementById("message");
+
+      // Fetch the data from the API endpoint
+        fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+            // console.log(data.centres,'82');
+            States.forEach((state) => {
+                const option = document.createElement("option");
+                option.text = state;
+                option.value = state;
+                stateSelect.add(option);
+            });
+
+            stateSelect.addEventListener("change", () => {
+                const selectedState = stateSelect.value;
+                const dataArray2 = Array.from(data.centres);
+                console.log(dataArray2, 96);
+                const filteredCenters = dataArray2.filter(
+                (center) => center.State === selectedState
+                );
+                console.log(filteredCenters, 98);
+                centerList.innerHTML = "";
+                if (selectedState === "") {
+                message.textContent = "Please select a state to show results";
+                } else if (filteredCenters.length === 0) {
+                message.textContent = "No results found for the selected state";
+                } else {
+                filteredCenters.forEach((center) => {
+                    const centerItem = document.createElement("li");
+                    centerItem.textContent = `${center.name}, ${center.Place}, ${center.State}`;
+                    centerList.appendChild(centerItem);
+                });
+                message.textContent = "";
+                }
+            });
+            stateSelect.dispatchEvent(new Event("change"));
+            })
+            .catch((error) => console.error(error));
+        </script>
+    </body>
+</html>
